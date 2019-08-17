@@ -1,3 +1,9 @@
+
+> 修改自  @hscmap/vue-menu  
+
+修改内容 
+当 hsc-menu-item 中自定义  body slot 的时候  hsc-menu-item依然可以绑定click事件
+
 # vue-menu
 ## Introduction
 
