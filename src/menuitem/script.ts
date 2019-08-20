@@ -1,4 +1,4 @@
-import * as keybind from "@hscmap/keybind";
+import * as keybind from "@caofeilong/keybind";
 import {Component, Inject, Prop, Vue} from "vue-property-decorator";
 import {MenuCloseEvent, MenuitemActivateEvent} from "../event";
 import {sync} from "../global";

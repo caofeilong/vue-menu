@@ -1,6 +1,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { CreateElement } from "vue"
-import * as keybind from '@hscmap/keybind'
+import * as keybind from '@caofeilong/keybind'
 
 
 @Component

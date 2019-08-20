@@ -1,6 +1,6 @@
 {
   "name": "@caofeilong/vue-menu",
-  "version": "2.10.0",
+  "version": "2.10.3",
   "description": "Vue component for menu & contextmenu",
   "main": "./lib/index.js",
   "types": "./lib/types/index.d.ts",
@@ -12,7 +12,7 @@
     "gh-pages": "npm run example && npm run standalone && cp standalone/dist/vue-menu-standalone.js example/dist && gh-pages -d example/dist"
   },
   "dependencies": {
-    "@hscmap/keybind": "^0.2.0",
+    "@caofeilong/keybind": "^0.1.0",
     "es6-promise": "^4.2.6",
     "tslib": "^1.9.3",
     "vue": "^2.6.10",
