@@ -179,6 +179,7 @@ export class MenuitemType extends Vue {
         })
     })
   }
+
 }
 
 

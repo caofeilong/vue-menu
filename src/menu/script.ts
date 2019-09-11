@@ -1,7 +1,7 @@
-import { MenuitemType } from "../menuitem/script"
-import { Vue, Component, Prop, Inject } from "vue-property-decorator"
-import { MenuCloseEvent } from "../event"
-import { MenuStyle, MENU_STYLE_KEY } from "../style"
+import {MenuitemType} from "../menuitem/script"
+import {Vue, Component, Prop, Inject} from "vue-property-decorator"
+import {MenuCloseEvent} from "../event"
+import {MenuStyle, MENU_STYLE_KEY} from "../style"
 
 
 export const PARENT_MENU_KEY = '@hscmap/vue-menu/parentMenu'
@@ -10,92 +10,106 @@ export type Direction = 'left' | 'right'
 
 
 @Component({
-    provide() { return { [PARENT_MENU_KEY]: this } }
+  provide() {
+    return {[PARENT_MENU_KEY]: this}
+  }
 })
 export class MenuType extends Vue {
-    @Prop()
-    parentMenuitem?: MenuitemType
+  @Prop()
+  parentMenuitem?: MenuitemType
 
-    @Inject(MENU_STYLE_KEY)
-    menuStyle!: MenuStyle
+  @Inject(MENU_STYLE_KEY)
+  menuStyle!: MenuStyle
 
-    isOpen = false
-    fade = 'none'
-    submenuDirection: Direction = 'right'
+  isOpen = false
+  fade = 'none'
+  submenuDirection: Direction = 'right'
 
-    open(x: number, y: number, position: Direction = 'right') {
-        this.setPosition(x, y, position)
-        this.isOpen = true;
+  open(x: number, y: number, position: Direction = 'right') {
+    this.setPosition(x, y, position)
+    this.isOpen = true;
+  }
+
+  close(fade: boolean, parent = false) {
+    if (this.isOpen) {
+      this.fade = (fade && this.menuStyle.animation) ? 'fade' : 'none'
+      this.isOpen = false
+      fade || (this.menuElement().style.display = 'none') // vue synchronizes dom to vdom at several millisecond intervals
+      this.$emit(MenuCloseEvent.type, new MenuCloseEvent(parent))
     }
-
-    close(fade: boolean, parent = false) {
-        if (this.isOpen) {
-            this.fade = (fade && this.menuStyle.animation) ? 'fade' : 'none'
-            this.isOpen = false
-            fade || (this.menuElement().style.display = 'none') // vue synchronizes dom to vdom at several millisecond intervals
-            this.$emit(MenuCloseEvent.type, new MenuCloseEvent(parent))
-        }
-        if (parent && this.parentMenuitem) {
-            this.parentMenuitem.parentMenu.close(fade, true)
-        }
+    if (parent && this.parentMenuitem) {
+      this.parentMenuitem.parentMenu.close(fade, true)
     }
+  }
 
-    setPosition(x: number, y: number, direction: Direction) {
-        x = Math.floor(x)
-        y = Math.floor(y)
+  setPosition(x: number, y: number, direction: Direction) {
+    x = Math.floor(x)
+    y = Math.floor(y)
 
-        show([this.menuElement(), this.wrapperElement()], ([menu, wrapper]) => {
-            let rect = menu.getBoundingClientRect()
+    show([this.menuElement(), this.wrapperElement()], ([menu, wrapper]) => {
+      let rect = menu.getBoundingClientRect()
 
-            menu.style.maxHeight = `${window.innerHeight - 2 * PADDING}px`
+      menu.style.maxHeight = `${window.innerHeight - 2 * PADDING}px`
 
-            wrapper.style.left = `${direction == 'right' ? x : x - rect.width + 1}px`
-            wrapper.style.top = `${y}px`
+      wrapper.style.left = `${direction == 'right' ? x : x - rect.width + 1}px`
+      wrapper.style.top = `${y}px`
 
-            rect = menu.getBoundingClientRect()
+      rect = menu.getBoundingClientRect()
 
-            if (rect.bottom > window.innerHeight) {
-                wrapper.style.top = `${window.innerHeight - rect.height}px`
-            }
+      if (rect.bottom > window.innerHeight) {
+        wrapper.style.top = `${window.innerHeight - rect.height}px`
+      }
 
-            this.submenuDirection = direction
+      this.submenuDirection = direction
 
-            if (rect.right > window.innerWidth) {
-                this.submenuDirection = 'left'
-                wrapper.style.left = `${x - rect.width - (this.parentMenuitem ? this.parentMenuitem.$el.clientWidth : 0)}px`
-            }
-            if (rect.left < 0) {
-                this.submenuDirection = 'right'
-                wrapper.style.left = `${x + (this.parentMenuitem ? this.parentMenuitem.$el.clientWidth : 0)}px`
-            }
-        })
+      if (rect.right > window.innerWidth) {
+        this.submenuDirection = 'left'
+        wrapper.style.left = `${x - rect.width - (this.parentMenuitem ? this.parentMenuitem.$el.clientWidth : 0)}px`
+      }
+      if (rect.left < 0) {
+        this.submenuDirection = 'right'
+        wrapper.style.left = `${x + (this.parentMenuitem ? this.parentMenuitem.$el.clientWidth : 0)}px`
+      }
+    })
+  }
+
+  menuElement() {
+    return <HTMLDivElement>this.$refs.menu
+  }
+
+  wrapperElement() {
+    return <HTMLDivElement>this.$refs.wrapper
+  }
+
+  get style() {
+    return {...this.menuStyle.menu, padding: `${PADDING}px 0`}
+  }
+
+
+  mounted() {
+    document.body.appendChild(this.$el)
+  }
+
+  beforeDestroy() {
+    if (this.$el && this.$el.parentNode) {
+      this.$el.parentNode.removeChild(this.$el)
     }
+  }
 
-    menuElement() {
-        return <HTMLDivElement>this.$refs.menu
-    }
-
-    wrapperElement() {
-        return <HTMLDivElement>this.$refs.wrapper
-    }
-
-    get style() {
-        return { ...this.menuStyle.menu, padding: `${PADDING}px 0` }
-    }
 }
 
 
 function show(targets: HTMLElement[], cb: (els: HTMLElement[]) => void) {
-    const originalStyle = targets.map(target => {
-        const { display, visibility } = target.style
-        target.style.display = 'block'
-        target.style.visibility = 'visible'
-        return { display, visibility }
-    })
-    cb(targets)
-    targets.forEach((target, i) => {
-        const { display, visibility } = originalStyle[i]
-        target.style.display = display
-        target.style.visibility = visibility
-    })
+  const originalStyle = targets.map(target => {
+    const {display, visibility} = target.style
+    target.style.display = 'block'
+    target.style.visibility = 'visible'
+    return {display, visibility}
+  })
+  cb(targets)
+  targets.forEach((target, i) => {
+    const {display, visibility} = originalStyle[i]
+    target.style.display = display
+    target.style.visibility = visibility
+  })
 }
